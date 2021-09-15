@@ -4,7 +4,15 @@
   hosts: all
   gather_facts: no
   connection: local
-
+  vars:
+    provider:
+      host: "{{ ansible_host }}"
+      username: "{{ secure_cisco_ios_provider_username }}"
+      password: "{{ secure_cisco_ios_provider_password }}"
+      authorize: "{{ secure_cisco_ios_provider_authorize }}"
+      auth_pass: "{{ secure_cisco_ios_provider_auth_pass }}"
+      port: "{{ secure_cisco_ios_provider_port }}"
+      timeout: "{{ secure_cisco_ios_provider_timeout }}"
 
   tasks:
 
@@ -14,6 +22,7 @@
     #
     - name: Collect all facts from the device
       ios_facts:
+        provider: "{{ provider }}"
         gather_subset: all
 
 
@@ -23,6 +32,7 @@
     #
     - name: Probe netwflow feature
       ios_config:
+        provider: "{{ provider }}"
         lines: 
           - "ip flow-export destination {{test_address}} 65535"
           - "no ip flow-export destination {{test_address}} 65535"
@@ -35,6 +45,7 @@
     #
     - name: Configure global settings
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       with_items:
               #- ip cef
@@ -70,6 +81,7 @@
 
     - name: Disable DNS lookups (conditional)
       ios_config:
+        provider: "{{ provider }}"
         lines: 
         - no ip domain-lookup
       when: not domain_lookup
@@ -79,12 +91,14 @@
 
     - name: Configure hostname and domain name
       ios_config:
+        provider: "{{ provider }}"
         lines:
           - hostname "{{ inventory_hostname }}"
           - "ip domain-name {{domain_name|default('example.com')}}"
 
     - name: Configure CDP globally
       ios_config:
+        provider: "{{ provider }}"
         lines: no cdp run
       when: enable_cdp is not defined or not enable_cdp
 
@@ -95,12 +109,14 @@
     #
     - name: Configure AAA
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       with_items:
         - aaa new-model
 
     - name: Configure local-only AAA (conditional)
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       with_items:
         - aaa authentication login default local-case
@@ -114,6 +130,7 @@
     #
     - name: Configure TACACS+ AAA (conditional)
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       with_items:
         - aaa authentication login default group tacacs+ local-case
@@ -126,22 +143,26 @@
 
     - name: Configure TACACS+ servers (conditional)
       ios_config:
+        provider: "{{ provider }}"
         lines: "tacacs-server {{ item }}"
       with_items: "{{ tacacs_servers }}"
       when: tacacs_servers is defined
 
     - name: Configure TACACS+ key
       ios_config:
+        provider: "{{ provider }}"
         lines: "tacacs-server key {{tacacs_server_key}}"
       when: tacacs_servers is defined and tacacs_server_key is defined
 
     - name: Configure TACACS+ timeout
       ios_config:
+        provider: "{{ provider }}"
         lines: "tacacs-server timeout {{tacacs_server_timeout}}"
       when: tacacs_servers is defined and tacacs_server_timeout is defined
 
     - name: Configure TACACS+ source interface
       ios_config:
+        provider: "{{ provider }}"
         lines: "ip tacacs source-interface {{tacacs_source_interface}}"
       when: tacacs_servers is defined and tacacs_source_interface is defined
 
@@ -162,14 +183,17 @@
     # TODO: logging size parameter
     - name: Configure archiving (archive)
       ios_config:
-        
+        provider: "{{ provider }}"
+
     - name: Configure archiving (archive/log config)
       ios_config:
+        provider: "{{ provider }}"
         lines: log config
         parents: archive
 
     - name: Configure archiving (archive/log config/*)
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
         parents:
           - archive
@@ -187,6 +211,7 @@
     #
     - name: Exception core file to FTP server (optional)
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       with_items:
         - "ip ftp username {{exception_ftp_username}}"
@@ -202,11 +227,13 @@
     #
     - name: NTP servers
       ios_config:
+        provider: "{{ provider }}"
         lines: "ntp server {{ item }}"
       with_items: "{{ ntp_servers }}"
 
     - name: NTP and time settings
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       with_items:
         - "clock timezone {{timezone_name|default(UTC)}} {{timezone_offset_hours|default(0)}} {{timezone_offset_minutes|default(omit)}}"
@@ -222,6 +249,7 @@
     #
     - name: Configure loopback0 interface
       ios_config:
+        provider: "{{ provider }}"
         # Don't put 'no ...' lines in here!!!
         lines:
           - "interface Loopback 0"
@@ -232,6 +260,7 @@
 
     - name: Configure null0 interface
       ios_config:
+        provider: "{{ provider }}"
         # Don't put 'no ...' lines in here!!!
         lines:
           - "interface Null 0"
@@ -247,6 +276,7 @@
     #
     - name: Configure netflow (settings)
       ios_config:
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       when: netflow_destinations is defined and netwflow_is_supported is defined
       with_items:
@@ -255,6 +285,7 @@
 
     - name: Configure netflow (destinations)
       ios_config:
+        provider: "{{ provider }}"
         lines: "ip flow-export destination {{item.host}} {{item.port}}"
       when: netflow_destinations is defined and netwflow_is_supported is defined
       with_items: "{{netflow_destinations}}"
@@ -266,7 +297,7 @@
     #
     - name: Configure logging (settings)
       ios_config:
-        
+        provider: "{{ provider }}"
         lines: "{{ item }}"
       when: logging_destinations is defined
       with_items:
@@ -276,7 +307,7 @@
 
     - name: Configure logging (destinations)
       ios_config:
-        
+        provider: "{{ provider }}"
         lines: "logging {{item}}"
       when: logging_destinations is defined
       with_items: "{{logging_destinations}}"
@@ -288,6 +319,7 @@
     #
     - name: SNMP access list
       ios_config:
+        provider: "{{ provider }}"
         lines: "access-list 20 permit {{item}}"
         #before: "no access-list 20"
         after: access-list 20 deny any log
@@ -296,12 +328,14 @@
 
     - name: SNMP read-only community
       ios_config:
+        provider: "{{ provider }}"
         lines: "snmp-server community {{item}} ro 20"
       when: snmp_readonly_communities is defined
       with_items: "{{snmp_readonly_communities}}"
 
     - name: SNMP read-write community
       ios_config:
+        provider: "{{ provider }}"
         lines: "snmp-server community {{item}} rw 20"
       when: snmp_readonly_communities is defined
       with_items: "{{snmp_readwrite_communities}}"
@@ -317,6 +351,7 @@
     #
     - name: Configure login banner
       ios_banner:
+        provider: "{{ provider }}"
         banner: login
         text: |
               ==========================================================================================
@@ -335,6 +370,7 @@
     #
     - name: login
       ios_config:
+        provider: "{{ provider }}"
         lines:
           - login block-for 100 attempts 15 within 100
           - login quiet-mode access-class 100
@@ -342,6 +378,7 @@
 
     - name: line con 0
       ios_config:
+        provider: "{{ provider }}"
         parents:
           - line con 0
         lines:
@@ -350,7 +387,7 @@
             # TODO: check for linx aux 0 first
             #    - name: line aux 0
             #      ios_config:
-            #        
+            #        provider: "{{ provider }}"
             #        parents:
             #          - line aux 0
             #        lines:
@@ -358,6 +395,7 @@
 
     - name: line vty 0 3 access list
       ios_config:
+        provider: "{{ provider }}"
         lines: "access-list 100 permit tcp {{item.host}} {{item.mask|default(omit)}} host 0.0.0.0 eq 22 log-input"
         # access-list 100 permit tcp 10.0.0.0 192.168.0.0 host 0.0.0.0 eq 22 log-input
         after: access-list 100 deny ip any any log-input
@@ -367,6 +405,7 @@
 
     - name: line vty 0 3
       ios_config:
+        provider: "{{ provider }}"
         parents:
         - line vty 0 3
         lines:
@@ -376,6 +415,7 @@
 
     - name: line vty 0 3 ACL
       ios_config:
+        provider: "{{ provider }}"
         lines:
           - access-class 100 in
         parents:
@@ -384,6 +424,7 @@
 
     - name: line vty 4 access list
       ios_config:
+        provider: "{{ provider }}"
         lines: "access-list 105 permit tcp host {{item}} host 0.0.0.0 range 22 log-input"
         after: access-list 105 deny ip any any log-input
         before: no access-list 105
@@ -392,6 +433,7 @@
 
     - name: line 4 vty
       ios_config:
+        provider: "{{ provider }}"
         parents:
         - line vty 4
         lines:
@@ -405,7 +447,7 @@
     #
     # Save config
     #
- #   - name: Save running-config to startup-config
- #     ios_command:
- #       
- #       commands: write
+    - name: Save running-config to startup-config
+      ios_command:
+        provider: "{{ provider }}"
+        commands: write
