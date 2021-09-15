@@ -204,6 +204,7 @@
       ios_config:
         lines: "ntp server {{ item }}"
       with_items: "{{ ntp_servers }}"
+      when: ntp_servers is defined 
 
     - name: NTP and time settings
       ios_config:
