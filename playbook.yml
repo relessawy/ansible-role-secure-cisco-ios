@@ -48,8 +48,8 @@
         - logging buffered 16384
         - no logging console
         - no enable password
-        - "enable secret 0 {{enable_secret}}"
-        - "username {{ user_name }} secret {{ user_password }}"
+    #    - "enable secret 0 {{enable_secret}}"
+    #    - "username {{ user_name }} secret {{ user_password }}"
         - no ip http server
         - no ip http secure-server
         - ip subnet-zero
