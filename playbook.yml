@@ -21,13 +21,13 @@
     #  
     #  Probe for features
     #
-    - name: Probe netwflow feature
-      ios_config:
-        lines: 
-          - "ip flow-export destination {{test_address}} 65535"
-          - "no ip flow-export destination {{test_address}} 65535"
-      register: netflow_is_supported
-      ignore_errors: yes
+    # - name: Probe netwflow feature
+    #   ios_config:
+    #     lines: 
+    #       - "ip flow-export destination {{test_address}} 65535"
+    #       - "no ip flow-export destination {{test_address}} 65535"
+    #   register: netflow_is_supported
+    #   ignore_errors: yes
 
     # -----------------------------------------------------
     #
