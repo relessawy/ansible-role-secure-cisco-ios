@@ -1,7 +1,7 @@
 ---
 
 - name: Configure Cisco IOS
-  hosts: routers
+  hosts: all
   gather_facts: no
   connection: local
   vars:
