@@ -68,11 +68,11 @@
     # TODO: some of the above must be skipped if they are already in the current config
     #        (facts: ansible_net_config)
 
-    - name: Disable DNS lookups (conditional)
-      ios_config:
-        lines: 
-        - no ip domain-lookup
-      when: not domain_lookup
+    # - name: Disable DNS lookups (conditional)
+    #   ios_config:
+    #     lines: 
+    #     - no ip domain-lookup
+    #   when: not domain_lookup
 
     - debug:
         msg: "********** DNS lookups are disabled **********"
