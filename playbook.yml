@@ -206,11 +206,11 @@
       with_items: "{{ ntp_servers }}"
       when: ntp_servers is defined 
 
-    - name: NTP and time settings
-      ios_config:
-        lines: "{{ item }}"
-      with_items:
-        - "clock timezone {{timezone_name|default('UTC')}} {{timezone_offset_hours|default(0)}} {{timezone_offset_minutes|default(omit)}}"
+    # - name: NTP and time settings
+    #   ios_config:
+    #     lines: "{{ item }}"
+    #   with_items:
+    #     - "clock timezone {{timezone_name|default('UTC')}} {{timezone_offset_hours|default(0)}} {{timezone_offset_minutes|default(omit)}}"
 
 
     # TODO: configure advanced NTP settings.
