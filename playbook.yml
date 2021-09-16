@@ -236,7 +236,7 @@
         provider: "{{ provider }}"
         lines: "{{ item }}"
       with_items:
-        - "clock timezone {{timezone_name|default(UTC)}} {{timezone_offset_hours|default(0)}} {{timezone_offset_minutes|default(omit)}}"
+        - "clock timezone {{timezone_name|default('UTC')}} {{timezone_offset_hours|default(0)}} {{timezone_offset_minutes|default(omit)}}"
 
 
     # TODO: configure advanced NTP settings.
